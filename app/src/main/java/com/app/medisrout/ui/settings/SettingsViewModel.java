@@ -14,6 +14,8 @@ public class SettingsViewModel extends AndroidViewModel {
     private MutableLiveData<String> currentUserName;
     private MutableLiveData<String> currentNumberPatient;
     private MutableLiveData<String> maxNumberPatient;
+    private MutableLiveData<String> toastMsg;
+
     private SharedData data;
 
     public SettingsViewModel(@NonNull Application application) {
@@ -23,7 +25,6 @@ public class SettingsViewModel extends AndroidViewModel {
         maxNumberPatient = new MutableLiveData<>();
         data = new SharedData(application);
     }
-
 
     public MutableLiveData<String> getCurrentUserName() {
         return currentUserName;
@@ -45,7 +46,6 @@ public class SettingsViewModel extends AndroidViewModel {
         currentNumberPatient.setValue(String.valueOf(0));
     }
 
-
     public void saveSettings() {
         String userName = currentUserName.getValue();
         String maxNumber = maxNumberPatient.getValue();
@@ -53,10 +53,11 @@ public class SettingsViewModel extends AndroidViewModel {
         if (!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(maxNumber)) {
             data.putValue("UserName", userName);
             data.putValue("MaxNumber", Integer.valueOf(maxNumber));
-
-
+            toastMsg.setValue("SuccessFull");
         }
     }
 
-
+    public MutableLiveData<String> getToastMsg() {
+        return toastMsg;
+    }
 }

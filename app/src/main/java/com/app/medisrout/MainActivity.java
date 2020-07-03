@@ -2,42 +2,44 @@ package com.app.medisrout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.databinding.DataBindingUtil;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.app.medisrout.databinding.ActivityMainBinding;
 import com.app.medisrout.model.SharedData;
-import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
+    private ActivityMainBinding activityMainBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        setUpView();
+        loadUserName();
+    }
 
+    private void setUpView() {
+        setSupportActionBar(activityMainBinding.appBar.toolbar);
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_settings)
-                .setDrawerLayout(drawer)
+                .setOpenableLayout(activityMainBinding.drawerLayout)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
-        navigationView.setNavigationItemSelectedListener(item -> {
+        NavigationUI.setupWithNavController(activityMainBinding.navView, navController);
+        activityMainBinding.navView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_home:
                     Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.nav_home);
@@ -51,8 +53,6 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
-
-
     }
 
     private void shareApp() {
@@ -67,6 +67,13 @@ public class MainActivity extends AppCompatActivity {
         } catch (android.content.ActivityNotFoundException ex) {
             Toast.makeText(MainActivity.this, "No email clients installed.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void loadUserName() {
+        SharedData sharedData = new SharedData(this);
+        String userName = sharedData.getValue(SharedData.ReturnValue.STRING, "UserName");
+        if (!TextUtils.isEmpty(userName))
+            Toast.makeText(this, "Hi," + userName, Toast.LENGTH_SHORT).show();
     }
 
     @Override
